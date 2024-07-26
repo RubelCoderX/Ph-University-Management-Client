@@ -39,7 +39,10 @@ const CreateAcademicSemester = () => {
           position: "top-center",
         });
       } else {
-        toast.success("Semester Created!!", { id: toastId });
+        toast.success("Semester Created!!", {
+          position: "top-center",
+          id: toastId,
+        });
       }
     } catch (error) {
       toast.error("Something went wrong", { id: toastId });
