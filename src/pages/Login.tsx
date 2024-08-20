@@ -16,8 +16,8 @@ const Login = () => {
   const dispatch = useAppDispatch();
 
   const defaultValues = {
-    id: "A-0001",
-    password: "Rubel@8965",
+    id: "2025010002",
+    password: "student@123",
   };
 
   const [login] = authApi.useLoginMutation();
@@ -30,11 +30,20 @@ const Login = () => {
         password: data.password,
       };
       const res = await login(userInfo).unwrap();
+
       const user = verifyToken(res.data.AccessToken) as TUser;
 
       dispatch(setUser({ user: user, token: res.data.AccessToken }));
-      toast.success("Logged in", { id: toastId, duration: 2000 });
-      navigate(`/${user.role}/dashboard`);
+      toast.success("Logged in", {
+        id: toastId,
+        duration: 2000,
+        position: "top-center",
+      });
+      if (res.data.needsPasswordChage) {
+        navigate(`/change-password`);
+      } else {
+        navigate(`/${user.role}/dashboard`);
+      }
     } catch (error) {
       toast.error(error?.data?.message, {
         id: toastId,

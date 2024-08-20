@@ -7,7 +7,7 @@ import PhDatePicker from "../../../components/form/PhDatePicker";
 import { Controller, FieldValues, SubmitHandler } from "react-hook-form";
 import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
 import { toast } from "sonner";
-
+import { useState } from "react";
 const { Title } = Typography;
 
 const defaultValues = {
@@ -32,25 +32,36 @@ const defaultValues = {
 };
 const CreateAdmin = () => {
   const [addAdmin] = userManagementApi.useAddAdminMutation();
+  const [loading, setLoading] = useState(false);
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const adminData = {
-      password: "admin@123",
-      admin: data,
-    };
-    const formData = new FormData();
-    formData.append("data", JSON.stringify(adminData));
-    formData.append("file", data.image);
+    try {
+      setLoading(true);
+      const adminData = {
+        password: "admin@123",
+        admin: data,
+      };
 
-    addAdmin(formData);
-    toast.success("Admin Created Successfully!", {
-      position: "top-center",
-    });
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(adminData));
+      formData.append("file", data.image);
+
+      await addAdmin(formData).unwrap();
+      toast.success("Admin Created Successfully!", {
+        position: "top-center",
+      });
+    } catch (error) {
+      toast.error(`Error: ${error?.data?.errorSources}`, {
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Row>
       <Col span={24}>
-        <Title level={2} style={{ textAlign: "center", margin: "16px 0" }}>
+        <Title level={2} style={{ textAlign: "center", margin: "30px" }}>
           Create Admin
         </Title>
       </Col>
@@ -130,7 +141,9 @@ const CreateAdmin = () => {
             </Col>
           </Row>
 
-          <Button htmlType="submit">Submit</Button>
+          <Button htmlType="submit" type="primary" loading={loading}>
+            {loading ? "Submitting..." : "Submit"}
+          </Button>
         </PhForm>
       </Col>
     </Row>

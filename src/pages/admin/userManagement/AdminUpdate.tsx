@@ -25,26 +25,17 @@ type InputConfig = {
   disabled?: boolean;
 };
 
-const StudentUpdate = () => {
-  const { studentId } = useParams();
-  const [updateStudent] = userManagementApi.useUpdateStudentMutation();
-  const { data: studentData, isLoading: studentLoading } =
-    userManagementApi.useGetStudentByIdQuery(studentId);
+const AdminUpdate = () => {
+  const { adminId } = useParams();
+  const [updateAdmin] = userManagementApi.useUpdateAdminMutation();
+  const { data: adminData, isLoading: studentLoading } =
+    userManagementApi.useGetAdminByIdQuery(adminId);
   const { data: semesterData, isLoading: sIsLoading } =
     academicManagementApi.useGetAllSemestersQuery(undefined);
   const { data: departmentData, isLoading: dIsLoading } =
-    academicManagementApi.useGetAllDepartmentQuery(undefined, {
+    academicManagementApi.useGetAllAcademicDepartmentQuery(undefined, {
       skip: sIsLoading,
     });
-
-  const semesterOptions = semesterData?.data?.map((item) => ({
-    value: item._id,
-    label: `${item.name} ${item.year}`,
-  }));
-  const departmentOptions = departmentData?.data?.map((item) => ({
-    value: item._id,
-    label: item.name,
-  }));
 
   const { handleSubmit, control, setValue } = useForm({
     defaultValues: {
@@ -58,71 +49,38 @@ const StudentUpdate = () => {
       emergencyContactNo: "",
       presentAddress: "",
       permanentAddress: "",
-      guardian: {
-        fatherName: "",
-        fatherOccupation: "",
-        fatherContactNo: "",
-        motherName: "",
-        motherOccupation: "",
-        motherContactNo: "",
-      },
-      localGuardian: { name: "", occupation: "", contactNo: "", address: "" },
-      admissionSemester: "",
-      academicDepartment: "",
     },
   });
 
   useEffect(() => {
-    if (studentData) {
+    if (adminData) {
       const fields = [
-        ["name.firstName", studentData.data.name.firstName],
-        ["name.middleName", studentData.data.name.middleName],
-        ["name.lastName", studentData.data.name.lastName],
-        ["gender", studentData.data.gender],
-        ["dateOfBirth", studentData.data.dateOfBirth],
-        ["bloodGroup", studentData.data.bloodGroup],
-        ["image", studentData.data.image],
-        ["email", studentData.data.email],
-        ["contactNo", studentData.data.contactNo],
-        ["emergencyContactNo", studentData.data.emergencyContactNo],
-        ["presentAddress", studentData.data.presentAddress],
-        ["permanentAddress", studentData.data.permanentAddress],
-        ["guardian.fatherName", studentData.data.guardian.fatherName],
-        [
-          "guardian.fatherOccupation",
-          studentData.data.guardian.fatherOccupation,
-        ],
-        ["guardian.fatherContactNo", studentData.data.guardian.fatherContactNo],
-        ["guardian.motherName", studentData.data.guardian.motherName],
-        [
-          "guardian.motherOccupation",
-          studentData.data.guardian.motherOccupation,
-        ],
-        ["guardian.motherContactNo", studentData.data.guardian.motherContactNo],
-        ["localGuardian.name", studentData.data.localGuardian.name],
-        ["localGuardian.occupation", studentData.data.localGuardian.occupation],
-        ["localGuardian.contactNo", studentData.data.localGuardian.contactNo],
-        ["localGuardian.address", studentData.data.localGuardian.address],
-        ["admissionSemester", studentData.data.admissionSemester?._id || ""],
-        ["academicDepartment", studentData.data.academicDepartment?._id || ""],
+        ["name.firstName", adminData.data.name.firstName],
+        ["name.middleName", adminData.data.name.middleName],
+        ["name.lastName", adminData.data.name.lastName],
+        ["gender", adminData.data.gender],
+        ["dateOfBirth", adminData.data.dateOfBirth],
+        ["bloodGroup", adminData.data.bloodGroup],
+        ["image", adminData.data.image],
+        ["email", adminData.data.email],
+        ["contactNo", adminData.data.contactNo],
+        ["emergencyContactNo", adminData.data.emergencyContactNo],
+        ["presentAddress", adminData.data.presentAddress],
+        ["permanentAddress", adminData.data.permanentAddress],
       ];
       fields.forEach(([field, value]) => setValue(field, value));
     }
-  }, [studentData, setValue]);
+  }, [adminData, setValue]);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const studentData = {
-      student: {
+    const adminData = {
+      admin: {
         ...data,
-        admissionSemester:
-          data.admissionSemester?.value || data.admissionSemester,
-        academicDepartment:
-          data.academicDepartment?.value || data.academicDepartment,
       },
     };
     try {
-      await updateStudent({ studentId, data: studentData }).unwrap();
-      toast.success("Student Update is Successful!", {
+      await updateAdmin({ adminId, data: adminData }).unwrap();
+      toast.success("Admin Data Update is Successful!", {
         position: "top-center",
       });
     } catch (error) {
@@ -208,68 +166,11 @@ const StudentUpdate = () => {
     },
   ];
 
-  const guardianInfo: InputConfig[] = [
-    { component: "input", name: "guardian.fatherName", label: "Father Name" },
-    {
-      component: "input",
-      name: "guardian.fatherOccupation",
-      label: "Father Occupation",
-    },
-    {
-      component: "input",
-      name: "guardian.fatherContactNo",
-      label: "Father Contact No",
-    },
-    { component: "input", name: "guardian.motherName", label: "Mother Name" },
-    {
-      component: "input",
-      name: "guardian.motherOccupation",
-      label: "Mother Occupation",
-    },
-    {
-      component: "input",
-      name: "guardian.motherContactNo",
-      label: "Mother Contact No",
-    },
-  ];
-
-  const localGuardianInfo: InputConfig[] = [
-    { component: "input", name: "localGuardian.name", label: "Name" },
-    {
-      component: "input",
-      name: "localGuardian.occupation",
-      label: "Occupation",
-    },
-    {
-      component: "input",
-      name: "localGuardian.contactNo",
-      label: "Contact No",
-    },
-    { component: "input", name: "localGuardian.address", label: "Address" },
-  ];
-
-  const academicInfo: InputConfig[] = [
-    {
-      component: "select",
-      name: "admissionSemester",
-      label: "Admission Semester",
-      options: semesterOptions,
-      disabled: sIsLoading,
-    },
-    {
-      component: "select",
-      name: "academicDepartment",
-      label: "Academic Department",
-      options: departmentOptions,
-      disabled: dIsLoading,
-    },
-  ];
-
   return (
     <Row>
       <Col span={24}>
         <Title level={2} style={{ textAlign: "center", marginTop: "30px" }}>
-          Update Student Data
+          Update Admin Data
         </Title>
       </Col>
       <Col span={24}>
@@ -278,12 +179,7 @@ const StudentUpdate = () => {
           <Row gutter={8}>{renderInputs(personalInfo)}</Row>
           <Divider>Contact Information</Divider>
           <Row gutter={8}>{renderInputs(contactInfo)}</Row>
-          <Divider>Guardian Information</Divider>
-          <Row gutter={8}>{renderInputs(guardianInfo)}</Row>
-          <Divider>Local Guardian Information</Divider>
-          <Row gutter={8}>{renderInputs(localGuardianInfo)}</Row>
-          <Divider>Academic Information</Divider>
-          <Row gutter={8}>{renderInputs(academicInfo)}</Row>
+
           <Button htmlType="submit">Submit</Button>
         </PhForm>
       </Col>
@@ -291,4 +187,4 @@ const StudentUpdate = () => {
   );
 };
 
-export default StudentUpdate;
+export default AdminUpdate;

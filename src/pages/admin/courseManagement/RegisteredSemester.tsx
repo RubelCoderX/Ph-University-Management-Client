@@ -1,28 +1,48 @@
-import { Button, Space, Table, TableColumnsType, TableProps } from "antd";
+import {
+  Button,
+  Dropdown,
+  Space,
+  Table,
+  TableColumnsType,
+  TableProps,
+  Tag,
+} from "antd";
 import { academicManagementApi } from "../../../redux/features/Admin/academicManagement.api";
-import { TAcademicSemester } from "../../../types/academicManagement.type";
 import { useState } from "react";
-import { TQueryParam } from "../../../types";
+import { TQueryParam, TSemester } from "../../../types";
 import { toast } from "sonner";
-import UpdateAcademicSemester from "./UpdateAcademicSemester";
+import { courseManagementApi } from "../../../redux/features/Admin/courseManagement.api";
+import moment from "moment";
+import { FieldValues, SubmitHandler } from "react-hook-form";
 
 export type TTableData = Pick<
-  TAcademicSemester,
-  "name" | "startMonth" | "endMonth" | "year"
+  TSemester,
+  "_id" | "startDate" | "endDate" | "status"
 >;
 
-const AcademicSemester = () => {
-  const [params, setParams] = useState<TQueryParam[] | undefined>(undefined);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSemester, setSelectedSemester] = useState<TTableData | null>(
-    null
-  );
+const items = [
+  {
+    label: "Upcoming",
+    key: "UPCOMING",
+  },
+  {
+    label: "Ongonig",
+    key: "ONGOING",
+  },
+  {
+    label: "Ended",
+    key: "ENDED",
+  },
+];
 
-  const {
-    data: semesterData,
-    isLoading,
-    isFetching,
-  } = academicManagementApi.useGetAllSemestersQuery(params);
+const RegisteredSemester = () => {
+  const [params, setParams] = useState<TQueryParam[] | undefined>(undefined);
+  const [semesterId, setSemesterId] = useState("");
+  const [updateSemesterStatus] =
+    courseManagementApi.useUpdateSemesterStatusMutation();
+
+  const { data: semesterData, isFetching } =
+    courseManagementApi.useGetAllSemesterRegistrationQuery(params);
 
   const [deleteAcademicSemester] =
     academicManagementApi.useDeleteAcademicSemesterMutation();
@@ -40,28 +60,28 @@ const AcademicSemester = () => {
     }
   };
 
-  const handleUpdate = (semester: TTableData) => {
-    setSelectedSemester(semester);
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
   const tableData = semesterData?.data?.map(
-    ({ _id, name, startMonth, endMonth, year }) => ({
+    ({ _id, academicSemester, status, startDate, endDate }) => ({
       key: _id,
-      name,
-      startMonth,
-      endMonth,
-      year,
+      name: `${academicSemester?.name} (${academicSemester?.year})`,
+      startDate: moment(new Date(startDate)).format("MMMM"),
+      endDate: moment(new Date(endDate)).format("MMMM"),
+      status,
     })
   );
+  const handleStatusUpdate: SubmitHandler<FieldValues> = (data) => {
+    const updateData = {
+      id: semesterId,
+      data: {
+        status: data.key,
+      },
+    };
+    updateSemesterStatus(updateData);
+  };
+  const menuProps = {
+    items,
+    onClick: handleStatusUpdate,
+  };
 
   const columns: TableColumnsType<TTableData> = [
     {
@@ -74,21 +94,34 @@ const AcademicSemester = () => {
       ],
     },
     {
-      title: "Year",
-      dataIndex: "year",
+      title: "Status",
+      dataIndex: "status",
       filters: [
         { text: "2024", value: "2024" },
         { text: "2025", value: "2025" },
         { text: "2026", value: "2026" },
       ],
+      render: (item) => {
+        let color;
+        if (item === "UPCOMING") {
+          color = "blue";
+        }
+        if (item === "ONGOING") {
+          color = "green";
+        }
+        if (item === "ENDED") {
+          color = "red";
+        }
+        return <Tag color={color}>{item}</Tag>;
+      },
     },
     {
-      title: "Start Month",
-      dataIndex: "startMonth",
+      title: "Start Date",
+      dataIndex: "startDate",
     },
     {
-      title: "End Month",
-      dataIndex: "endMonth",
+      title: "End Data",
+      dataIndex: "endDate",
     },
     {
       title: "Action",
@@ -96,7 +129,11 @@ const AcademicSemester = () => {
       render: (item) => {
         return (
           <Space size="middle">
-            <Button onClick={() => handleUpdate(item)}>Update</Button>
+            <Dropdown menu={menuProps} trigger={["click"]}>
+              <Button onClick={() => setSemesterId(item.key)}>
+                Update Status
+              </Button>
+            </Dropdown>
             <Button onClick={() => handleDelete(item.key)}>Delete</Button>
           </Space>
         );
@@ -133,15 +170,8 @@ const AcademicSemester = () => {
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
       />
-
-      <UpdateAcademicSemester
-        isOpen={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        semester={selectedSemester}
-      />
     </div>
   );
 };
 
-export default AcademicSemester;
+export default RegisteredSemester;

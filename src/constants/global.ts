@@ -1,3 +1,5 @@
+import { TError, TMeta } from "../types";
+
 export const monthNames = [
   "January",
   "February",
@@ -29,3 +31,11 @@ export const bloodGroupOptions = bloodGroup.map((item) => ({
   value: item,
   label: item,
 }));
+
+export type TResponse<T> = {
+  data?: T;
+  error?: TError;
+  meta?: TMeta;
+  success: boolean;
+  message: string;
+};

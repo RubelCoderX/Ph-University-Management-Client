@@ -8,46 +8,15 @@ import PhDatePicker from "../../../components/form/PhDatePicker";
 import { academicManagementApi } from "../../../redux/features/Admin/academicManagement.api";
 import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
 import { toast } from "sonner";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { studentValidationSchema } from "../../../schemas/createStudent.schema";
+
 const { Title } = Typography;
 
-//! this is only for development
-//! Should be removed
-
-// const studentDefaultValues = {
-//   name: {
-//     firstName: "Hamim",
-//     middleName: "",
-//     lastName: "Islam",
-//   },
-//   gender: "male",
-//   // dateOfBirth: "2000-01-01",
-//   email: "sunandita@gmail.com",
-//   contactNo: "1234567987",
-//   emergencyContactNo: "0987654321",
-//   bloodGroup: "A+",
-//   presentAddress: "123 Main St, Springfield, IL",
-//   permanentAddress: "456 Elm St, Springfield, IL",
-//   guardian: {
-//     fatherName: "James Doe",
-//     fatherOccupation: "Engineer",
-//     fatherContactNo: "1112223333",
-//     motherName: "Jane Doe",
-//     motherOccupation: "Teacher",
-//     motherContactNo: "4445556666",
-//   },
-//   localGuardian: {
-//     name: "Michael Smith",
-//     occupation: "Lawyer",
-//     contactNo: "7778889999",
-//     address: "789 Oak St, Springfield, IL",
-//   },
-//   // admissionSemester: "667535b3b859d6fbfcdf5989",
-
-//   // academicDepartment: "667533e4b859d6fbfcdf597d",
-// };
-
 const CreateStudent = () => {
-  const [addStudent] = userManagementApi.useAddStudentMutation();
+  const [addStudent, { isLoading }] = userManagementApi.useAddStudentMutation();
+  const [loading, setLoading] = useState(false);
 
   const { data: semesterData, isLoading: sIsLoading } =
     academicManagementApi.useGetAllSemestersQuery(undefined);
@@ -66,29 +35,40 @@ const CreateStudent = () => {
     value: item._id,
     label: item.name,
   }));
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    const studentData = {
-      password: "student123",
-      student: data,
-    };
-    const formData = new FormData();
-    formData.append("data", JSON.stringify(studentData));
-    formData.append("file", data.image);
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      setLoading(true);
+      const studentData = {
+        password: "student@123",
+        student: data,
+      };
 
-    addStudent(formData);
-    toast.success("Student Created is Successfull!", {
-      position: "top-center",
-    });
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(studentData));
+      formData.append("file", data.image);
+
+      await addStudent(formData).unwrap();
+      toast.success("Student is Created Successfully!", {
+        position: "top-center",
+      });
+    } catch (error) {
+      toast.error(`Error: ${error?.data?.message}`, { position: "top-center" });
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <Row>
       <Col span={24}>
-        <Title level={2} style={{ textAlign: "center", margin: "16px 0" }}>
+        <Title level={2} style={{ textAlign: "center", margin: "30px" }}>
           Create Student
         </Title>
       </Col>
       <Col span={24}>
-        <PhForm onSubmit={onSubmit}>
+        <PhForm
+          onSubmit={onSubmit}
+          resolver={zodResolver(studentValidationSchema)}
+        >
           <Divider>Personal Information</Divider>
           <Row gutter={8}>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
@@ -251,7 +231,9 @@ const CreateStudent = () => {
               />
             </Col>
           </Row>
-          <Button htmlType="submit">Submit</Button>
+          <Button htmlType="submit" type="primary" loading={loading}>
+            {loading ? "Submitting..." : "Submit"}
+          </Button>
         </PhForm>
       </Col>
     </Row>

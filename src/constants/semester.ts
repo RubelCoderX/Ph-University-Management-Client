@@ -12,3 +12,15 @@ export const semesterOptions = [
     label: "Fall",
   },
 ];
+
+export const semesterStatusOptions = [
+  { value: "UPCOMING", label: "Upcoming" },
+  { value: "ONGOING", label: "Ongoning" },
+  { value: "ENDED", label: "Ended" },
+];
+export const DaysOption = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"].map(
+  (day) => ({
+    value: day,
+    label: day,
+  })
+);

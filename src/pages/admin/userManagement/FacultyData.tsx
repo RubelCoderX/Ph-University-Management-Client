@@ -2,6 +2,7 @@ import {
   Button,
   Pagination,
   Space,
+  Spin,
   Table,
   TableColumnsType,
   TableProps,
@@ -10,20 +11,18 @@ import { userManagementApi } from "../../../redux/features/Admin/userManagement.
 import { Link } from "react-router-dom";
 import { TAdminData, TQueryParam } from "../../../types";
 import { useState } from "react";
-import { toast } from "sonner";
 import Swal from "sweetalert2";
+import { toast } from "sonner";
 
 export type TTableData = Pick<
   TAdminData,
-  "id" | "email" | "contactNo" | "name" | "user"
+  "id" | "email" | "contactNo" | "name"
 >;
-
-const AdminData = () => {
+const FacultyData = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
   const [page, setPage] = useState(1);
-  const [deleteAdmin] = userManagementApi.useDeleteAdminMutation();
-  const { data: adminData, isFetching } = userManagementApi.useGetAllAdminQuery(
-    [
+  const { data: facultyData, isFetching } =
+    userManagementApi.useGetAllFacultiesQuery([
       {
         name: "page",
         value: page,
@@ -33,16 +32,16 @@ const AdminData = () => {
         value: "id",
       },
       ...params,
-    ]
-  );
+    ]);
   const [statusChanged] = userManagementApi.useStatusChangedMutation();
-  const metaData = adminData?.meta;
+  const [deleteFaculty] = userManagementApi.useDeleteFacultyMutation();
+  const metaData = facultyData?.meta;
 
-  const tableData = adminData?.data?.map(
+  const tableData = facultyData?.data?.map(
     ({ _id, id, email, contactNo, name, user }) => ({
       key: _id,
-      id,
       userId: user?._id,
+      id,
       fullName: `${name.firstName} ${
         name.middleName ? name.middleName + " " : ""
       }${name.lastName}`,
@@ -62,7 +61,7 @@ const AdminData = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteAdmin(adminId).unwrap();
+          await deleteFaculty(adminId).unwrap();
           toast.success("Student deleted successfully!", {
             position: "top-center",
           });
@@ -74,7 +73,10 @@ const AdminData = () => {
       }
     });
   };
-  const handleStatusChange = async (adminId: string, currentStatus: string) => {
+  const handleStatusChange = async (
+    studentId: string,
+    currentStatus: string
+  ) => {
     const newStatus = currentStatus === "blocked" ? "in-progress" : "blocked";
 
     Swal.fire({
@@ -86,7 +88,7 @@ const AdminData = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await statusChanged({ id: adminId, status: newStatus }).unwrap();
+          await statusChanged({ id: studentId, status: newStatus }).unwrap();
           toast.success(`Student status changed to ${newStatus}!`, {
             position: "top-center",
           });
@@ -105,7 +107,7 @@ const AdminData = () => {
       dataIndex: "fullName",
     },
     {
-      title: "Admin ID",
+      title: "Employment ID",
       key: "_id",
       dataIndex: "id",
     },
@@ -124,11 +126,11 @@ const AdminData = () => {
       render: (item) => {
         return (
           <Space>
-            <Link to={`/admin/admin-data/${item.key}`}>
+            <Link to={`/admin/faculty-data/${item.key}`}>
               <Button>Details</Button>
             </Link>
 
-            <Link to={`/admin/admin-update/${item.key}`}>
+            <Link to={`/admin/student-update/${item.key}`}>
               <Button>Update</Button>
             </Link>
             <Button onClick={() => handleDelete(item.key)}>Delete</Button>
@@ -162,23 +164,39 @@ const AdminData = () => {
   };
   return (
     <div style={{ marginTop: "30px" }}>
-      <Table
-        loading={isFetching}
-        columns={columns}
-        dataSource={tableData}
-        onChange={onChange}
-        showSorterTooltip={{ target: "sorter-icon" }}
-        pagination={false}
-      />
-      <Pagination
-        current={page}
-        onChange={(value) => setPage(value)}
-        pageSize={metaData?.limit}
-        total={metaData?.total}
-        style={{ marginTop: 16 }}
-      />
+      {isFetching ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "calc(100vh - 64px)", // Adjust if you have a header
+          }}
+        >
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            onChange={onChange}
+            showSorterTooltip={{ target: "sorter-icon" }}
+            pagination={false}
+            scroll={{ x: true }}
+            style={{ overflowX: "auto" }}
+          />
+          <Pagination
+            current={page}
+            onChange={(value) => setPage(value)}
+            pageSize={metaData?.limit}
+            total={metaData?.total}
+            style={{ marginTop: 16 }}
+          />
+        </>
+      )}
     </div>
   );
 };
 
-export default AdminData;
+export default FacultyData;

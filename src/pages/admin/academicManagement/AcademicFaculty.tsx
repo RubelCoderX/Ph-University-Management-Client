@@ -1,6 +1,7 @@
 import { academicManagementApi } from "../../../redux/features/Admin/academicManagement.api";
 import { Button, Table } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
+import moment from "moment";
 
 type DataType = {
   key: React.Key;
@@ -17,8 +18,8 @@ const AcademicFaculty = () => {
     ({ _id, name, createdAt, updatedAt }) => ({
       key: _id,
       name,
-      createdAt,
-      updatedAt,
+      createdAt: moment(new Date(createdAt)).format("MMMM"),
+      updatedAt: moment(new Date(updatedAt)).format("MMMM"),
     })
   );
 
@@ -26,7 +27,6 @@ const AcademicFaculty = () => {
     {
       title: "Name",
       dataIndex: "name",
-
       filters: [
         {
           text: "Joe",
@@ -69,12 +69,15 @@ const AcademicFaculty = () => {
   };
 
   return (
-    <Table
-      columns={columns}
-      dataSource={tableData}
-      onChange={onChange}
-      showSorterTooltip={{ target: "sorter-icon" }}
-    />
+    <div style={{ marginTop: "30px" }}>
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        onChange={onChange}
+        scroll={{ x: "max-content" }} // Enable horizontal scrolling
+        showSorterTooltip={{ target: "sorter-icon" }}
+      />
+    </div>
   );
 };
 

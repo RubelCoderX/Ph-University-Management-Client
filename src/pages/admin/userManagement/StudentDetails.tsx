@@ -11,12 +11,12 @@ import {
   Tabs,
   Divider,
 } from "antd";
-
+import { DateTime, fullName } from "../../../types";
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 // Function to extract and format the date
-const formatDate = (datetime) => {
+const formatDate = (datetime: DateTime) => {
   if (!datetime) return datetime;
   const date = new Date(datetime);
   return date.toISOString().split("T")[0];
@@ -30,29 +30,51 @@ const StudentDetails = () => {
   } = userManagementApi.useGetStudentByIdQuery(studentId);
   const student = studentDetails?.data;
 
-  const capitalizeFirstLetter = (string) => {
+  const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
   // Function to construct full name
-  const getFullName = (name) => {
+  const getFullName = (name: fullName) => {
     if (!name) return "";
     const { firstName, middleName, lastName } = name;
     return `${firstName} ${middleName ? middleName + " " : ""}${lastName}`;
   };
   if (isLoading) {
-    return <Spin size="large" />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "calc(100vh - 64px)",
+          marginTop: "30px",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
   }
 
   if (error) {
-    return <Alert message="Error loading student details" type="error" />;
+    return <Alert message="Error loading faculty details" type="error" />;
   }
 
   return (
     <Card
-      title={`Profile ${getFullName(student?.name)}`}
+      title={
+        <span>
+          Profile{" "}
+          <span style={{ color: "#1777FF" }}>{getFullName(student?.name)}</span>
+        </span>
+      }
       extra={<a href="/dashboard">Back to Dashboard</a>}
-      style={{ width: "100%", maxWidth: 1200, margin: "auto" }}
+      style={{
+        width: "100%",
+        maxWidth: 1200,
+        margin: "auto",
+        marginTop: "30px",
+      }}
     >
       <Row gutter={24}>
         <Col xs={24} md={8}>
@@ -65,7 +87,7 @@ const StudentDetails = () => {
             }}
           >
             <Avatar
-              size={128}
+              size={180}
               src={student?.profileImg}
               style={{
                 marginBottom: 20,
@@ -181,7 +203,6 @@ const StudentDetails = () => {
                 </Row>
               </Card>
             </TabPane>
-
             <TabPane tab="Parents" key="2">
               <Card>
                 <Title level={4}>Parents Information</Title>
@@ -220,7 +241,7 @@ const StudentDetails = () => {
                 </Row>
               </Card>
             </TabPane>
-            <TabPane tab="Local Parents " key="3">
+            <TabPane tab="Local Parents" key="3">
               <Card>
                 <Title level={4}>Local Parents Information</Title>
                 <Divider></Divider>

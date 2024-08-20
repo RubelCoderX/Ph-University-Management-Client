@@ -1,0 +1,34 @@
+/* MainLayOut.css */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 12px 24px;
+  /* background: #021526; */
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-icon {
+  cursor: pointer;
+  font-size: large;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+  }
+
+  .header-icon {
+    font-size: medium;
+  }
+
+  .ant-typography-title {
+    font-size: 18px;
+  }
+
+  .ant-input-search {
+    width: 100%;
+  }
+}
