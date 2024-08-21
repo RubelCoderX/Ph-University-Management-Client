@@ -1,189 +1,168 @@
-import {
-  Button,
-  Pagination,
-  Space,
-  Table,
-  TableColumnsType,
-  TableProps,
-} from "antd";
-import { TStudentCourse } from "../../types/student.type";
-import { useState } from "react";
-import { TQueryParam } from "../../types";
+import React from "react";
+import { Table, Button, TableColumnsType, Space } from "antd";
 import { studentApi } from "../../redux/features/Student/StudentApi";
 
-export type TTableData = Pick<
-  TStudentCourse,
-  | "academicDepartment"
-  | "course"
-  | "days"
-  | "startTime"
-  | "endTime"
-  | "academicFaculty"
-  | "faculty"
-  | "maxCapacity"
-  | "section"
-  | "semesterRegistration"
-  | "academicSemester"
->;
+type Section = {
+  section: string;
+  _id: string;
+  days: string;
+  startTime: string;
+  endTime: string;
+};
 
-const studentOfferedCourse = () => {
-  const [params, setParams] = useState<TQueryParam[]>([]);
-  const [page, setPage] = useState(1);
-  const { data: offeredCourses, isFetching } =
-    studentApi.useGetMyOfferedCourseQuery([
-      {
-        name: "page",
-        value: page,
-      },
-      {
-        name: "sort",
-        value: "id",
-      },
-      ...params,
-    ]);
-  console.log(offeredCourses);
+type CourseData = {
+  courseTitle: string;
+  academicDepartment: string;
+  academicFaculty: string;
+  sections: Section[];
+};
 
-  const metaData = offeredCourses?.meta;
-  // const handleDelete = async (id: string) => {
-  //   try {
-  //     await deleteAcademicSemester(id).unwrap();
-  //     toast.success("Academic Semester deleted successfully!", {
-  //       position: "top-center",
-  //     });
-  //   } catch (error) {
-  //     const errorMessage =
-  //       error?.data?.message || "Failed to delete Academic Semester.";
-  //     toast.error(errorMessage, { position: "top-center" });
-  //   }
-  // };
+const StudentOfferedCourse: React.FC = () => {
+  const { data: offeredCourseData } =
+    studentApi.useGetMyOfferedCourseQuery(undefined);
+  const [enrollCourse] = studentApi.useEnrollCoursesMutation();
 
-  const tableData = offeredCourses?.data?.map(
-    ({
-      _id,
-      course,
-      startTime,
-      endTime,
-      semesterRegistration,
-      faculty,
-      maxCapacity,
-      section,
-      academicDepartment,
-      academicFaculty,
-      academicSemester,
-    }) => ({
-      key: _id,
-      faculty: `${faculty?.name?.firstName} ${
-        faculty?.name?.middleName ? faculty.name.middleName + " " : ""
-      }${faculty?.name?.lastName}`,
-      maxCapacity,
-      academicDepartment: academicDepartment.name,
-      academicFaculty: academicFaculty?.name,
-      semesterRegistration: semesterRegistration?.status,
-      courseName: course?.title,
-      academicSemester: academicSemester?.name,
-      startTime,
-      endTime,
-      section,
-    })
+  // Organize the data by course title
+  const singleObject = offeredCourseData?.data?.reduce(
+    (acc: Record<string, CourseData>, item) => {
+      const key = item.course.title;
+      const department = item.academicDepartment.name;
+      const faculty = item.academicFaculty.name;
+      if (!acc[key]) {
+        acc[key] = {
+          courseTitle: key,
+          academicDepartment: department,
+          academicFaculty: faculty,
+          sections: [],
+        };
+      }
+      acc[key].sections.push({
+        section: item.section,
+        _id: item._id,
+        days: item.days.join(", "), // Convert array of days to string
+        startTime: item.startTime,
+        endTime: item.endTime,
+      });
+      return acc;
+    },
+    {}
   );
 
-  const columns: TableColumnsType<TTableData> = [
+  const modifiedData: CourseData[] = Object.values(singleObject || {});
+
+  // Handle course enrollment
+  const handleEnroll = async (id: string) => {
+    console.log();
+    const enrollData = {
+      offeredCourse: id,
+    };
+    await enrollCourse(enrollData);
+  };
+
+  // Define columns for the table
+  const columns: TableColumnsType<CourseData> = [
     {
       title: "Course Name",
-      dataIndex: "courseName",
-      // filters: [
-      //   { text: "Fall", value: "Fall" },
-      //   { text: "Summer", value: "Summer" },
-      //   { text: "Autumn", value: "Autumn" },
-      // ],
+      dataIndex: "courseTitle",
+      key: "courseTitle",
     },
     {
-      title: "Faculty Name",
-      dataIndex: "faculty",
-    },
-    {
-      title: "Semester Name",
-      dataIndex: "academicSemester",
-    },
-    {
-      title: "Registration Status",
-      dataIndex: "semesterRegistration",
-    },
-    {
-      title: "Academic F.Name",
-      dataIndex: "academicFaculty",
-    },
-
-    {
-      title: "Department Name",
+      title: "Academic Department",
       dataIndex: "academicDepartment",
+      key: "academicDepartment",
     },
     {
-      title: "Max Capacity",
-      dataIndex: "maxCapacity",
+      title: "Academic Faculty",
+      dataIndex: "academicFaculty",
+      key: "academicFaculty",
+    },
+    {
+      title: "Section",
+      key: "section",
+      render: (_, record: CourseData) => (
+        <>
+          {record.sections.map((section, index) => (
+            <div key={index}>{section.section}</div>
+          ))}
+        </>
+      ),
+    },
+    {
+      title: "Days",
+      key: "days",
+      render: (_, record: CourseData) => (
+        <>
+          {record.sections.map((section, index) => (
+            <div key={index}>{section.days}</div>
+          ))}
+        </>
+      ),
     },
     {
       title: "Start Time",
-      dataIndex: "startTime",
+      key: "startTime",
+      render: (_, record: CourseData) => (
+        <>
+          {record.sections.map((section, index) => (
+            <div key={index}>{section.startTime}</div>
+          ))}
+        </>
+      ),
     },
     {
       title: "End Time",
-      dataIndex: "endTime",
+      key: "endTime",
+      render: (_, record: CourseData) => (
+        <>
+          {record.sections.map((section, index) => (
+            <div key={index}>{section.endTime}</div>
+          ))}
+        </>
+      ),
     },
-
     {
       title: "Action",
-      key: "x",
-      render: (item) => {
-        return (
-          <Space size="middle">
-            <Button>Update</Button>
-            <Button onClick={() => handleDelete(item.key)}>Delete</Button>
-          </Space>
-        );
-      },
-      width: "15%",
+      key: "action",
+      render: (_, record: CourseData) => (
+        <Space direction="vertical">
+          {record.sections.map((section) => (
+            <Button
+              key={section._id}
+              onClick={() => handleEnroll(section._id)}
+              style={{ marginBottom: "10px" }}
+            >
+              Enroll To Course
+            </Button>
+          ))}
+        </Space>
+      ),
     },
   ];
 
-  const onChange: TableProps<TTableData>["onChange"] = (
-    _pagination,
-    filters,
-    _sorter,
-    extra
-  ) => {
-    if (extra.action === "filter") {
-      const queryParams: TQueryParam[] = [];
-      filters.name?.forEach((item) =>
-        queryParams.push({ name: "name", value: item })
-      );
-      filters.year?.forEach((item) =>
-        queryParams.push({ name: "year", value: item })
-      );
-      setParams(queryParams);
-    }
-  };
-
+  if (!modifiedData.length) {
+    return (
+      <p
+        style={{
+          marginTop: "30px",
+          textAlign: "center",
+          fontSize: "20px",
+          fontWeight: "bold",
+        }}
+      >
+        No available Courses
+      </p>
+    );
+  }
   return (
-    <div style={{ marginTop: "30px" }}>
-      <Table
-        loading={isFetching}
-        columns={columns}
-        dataSource={tableData}
-        onChange={onChange}
-        scroll={{ x: "max-content" }}
-        showSorterTooltip={{ target: "sorter-icon" }}
-        pagination={false}
-      />
-      <Pagination
-        current={page}
-        onChange={(value) => setPage(value)}
-        pageSize={metaData?.limit}
-        total={metaData?.total}
-        style={{ marginTop: 16 }}
-      />
-    </div>
+    <Table
+      columns={columns}
+      dataSource={modifiedData}
+      rowKey="courseTitle"
+      pagination={false}
+      bordered
+      style={{ marginTop: "30px" }}
+    />
   );
 };
 
-export default studentOfferedCourse;
+export default StudentOfferedCourse;

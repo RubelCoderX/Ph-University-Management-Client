@@ -1,5 +1,6 @@
-import { Form, TimePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import { Form, TimePicker } from "antd";
+
 type TPHDatePicker = {
   name: string;
   label: string;
@@ -7,6 +8,7 @@ type TPHDatePicker = {
 
 const PhTimePicker = ({ name, label }: TPHDatePicker) => {
   const { control } = useFormContext();
+
   return (
     <div style={{ marginBottom: "10px" }}>
       <Controller

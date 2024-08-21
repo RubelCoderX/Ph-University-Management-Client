@@ -25,7 +25,7 @@ import OfferedCourse from "../pages/admin/courseManagement/OfferedCourse";
 
 export const adminPaths = [
   {
-    name: "Dashboard",
+    name: "Admin Dashboard",
     path: "dashboard",
     element: <AdminDashboard />,
   },

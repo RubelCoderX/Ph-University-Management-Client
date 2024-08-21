@@ -133,7 +133,7 @@ export type TFaculty = {
   permanentAddress: string;
   profileImg: string;
   academicDepartment: AcademicDepartment;
-  academicFaculty: string;
+  academicFaculty: TFaculty;
   isDeleted: boolean;
   __v: number;
 };

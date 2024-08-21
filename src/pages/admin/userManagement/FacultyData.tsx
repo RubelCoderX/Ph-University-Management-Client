@@ -9,15 +9,12 @@ import {
 } from "antd";
 import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
 import { Link } from "react-router-dom";
-import { TAdminData, TQueryParam } from "../../../types";
+import { TAdminData, TFaculty, TQueryParam } from "../../../types";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 
-export type TTableData = Pick<
-  TAdminData,
-  "id" | "email" | "contactNo" | "name"
->;
+export type TTableData = Pick<TFaculty, "id" | "email" | "contactNo" | "name">;
 const FacultyData = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
   const [page, setPage] = useState(1);

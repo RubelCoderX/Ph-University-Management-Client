@@ -46,7 +46,7 @@ const CreateFaculty = () => {
     try {
       setLoading(true);
       const facultyData = {
-        password: "admin@123",
+        password: "faculty@123",
         faculty: data,
       };
       const formData = new FormData();

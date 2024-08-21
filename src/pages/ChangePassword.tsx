@@ -17,22 +17,20 @@ const ChangePassword = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await changePassword(data);
-      if (res.data.success) {
-        // toast.success("Password changed successfully!", {
-        //   duration: 2000,
-        //   position: "top-center",
-        // });
+      if (res?.data?.success) {
+        toast.success("Password changed successfully!", {
+          duration: 2000,
+          position: "top-center",
+        });
 
         // Wait a bit to show the success message
-
-        dispatch(logOut());
-        navigate("/login", { replace: true });
+        setTimeout(() => {
+          dispatch(logOut());
+          navigate("/login", { replace: true });
+        }, 2000);
       }
     } catch (error) {
-      toast.error(error?.data?.message || "Password change failed", {
-        duration: 2000,
-        position: "top-center",
-      });
+      toast.error(result?.error?.data.message);
     }
   };
 

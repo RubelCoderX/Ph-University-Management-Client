@@ -28,9 +28,12 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 > = async (args, api, extraOptions): Promise<any> => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 404) {
+  if (result?.error?.status === 403) {
     // toast.error(result.error.data.message, { position: "top-center" });
   }
+  // if (result?.error?.status === 403) {
+  //   toast.error(result?.error?.data.message);
+  // }
   if (result?.error?.status === 401) {
     //* Send refresh token
     const res = await fetch("http://localhost:3000/api/v1/auth/refresh-token", {
@@ -67,5 +70,6 @@ export const baseApi = createApi({
     "course",
     "academicDepartment",
     "offeredCourses",
+    "enrolledCourse",
   ],
 });

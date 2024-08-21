@@ -1,3 +1,4 @@
+import { TQueryParam, TResponseRedux } from "../../../types";
 import { baseApi } from "../../api/baseApi";
 
 export const studentApi = baseApi.injectEndpoints({
@@ -9,12 +10,53 @@ export const studentApi = baseApi.injectEndpoints({
       }),
       providesTags: ["student"],
     }),
+
     getMyOfferedCourse: builder.query({
-      query: () => ({
-        url: "/offered-course/my-offered-courses",
-        method: "GET",
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            params.append(item.name, item.value as string);
+          });
+        }
+        return {
+          url: "/offered-course/my-offered-courses",
+          method: "GET",
+          params: params,
+        };
+      },
+      providesTags: ["enrolledCourse"],
+    }),
+    // enroll course
+    enrollCourses: builder.mutation({
+      query: (data) => ({
+        url: "/enroll-courses/create-enrolled-course",
+        method: "POST",
+        body: data,
       }),
-      providesTags: ["course"],
+      invalidatesTags: ["enrolledCourse"],
+    }),
+    getMySchedule: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            params.append(item.name, item.value as string);
+          });
+        }
+        return {
+          url: "/enroll-courses/my-enrolled-courses",
+          method: "GET",
+          params: params,
+        };
+      },
+      transformResponse: (response: TResponseRedux<any>) => {
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
+      providesTags: ["enrolledCourse"],
     }),
   }),
 });

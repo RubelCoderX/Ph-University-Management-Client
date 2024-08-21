@@ -12,14 +12,9 @@ import { DaysOption } from "../../../constants/semester";
 import { useState } from "react";
 import PhSelectWithWatch from "../../../components/form/PhSelectWithWatch";
 import PhTimePicker from "../../../components/form/PhTimePicker";
+import moment from "moment";
 
 const { Title } = Typography;
-
-const validateTimeFormat = (time: string) => {
-  // Regular expression to validate HH:MM format (24-hour clock)
-  const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
-  return timePattern.test(time);
-};
 
 const OfferedCourse = () => {
   const [id, setId] = useState("");
@@ -75,31 +70,33 @@ const OfferedCourse = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const toastId = toast.loading("Creating...");
-    // Validate time format for startTime and endTime
-    if (!validateTimeFormat(data.startTime)) {
-      toast.error(
-        'Invalid start time format, expected "HH:MM" in 24 hours format',
-        {
-          id: toastId,
-        }
-      );
-      return;
-    }
+    // // Validate time format for startTime and endTime
+    // if (!validateTimeFormat(data.startTime)) {
+    //   toast.error(
+    //     'Invalid start time format, expected "HH:MM" in 24 hours format',
+    //     {
+    //       id: toastId,
+    //     }
+    //   );
+    //   return;
+    // }
 
-    if (!validateTimeFormat(data.endTime)) {
-      toast.error(
-        'Invalid end time format, expected "HH:MM" in 24 hours format',
-        {
-          id: toastId,
-        }
-      );
-      return;
-    }
+    // if (!validateTimeFormat(data.endTime)) {
+    //   toast.error(
+    //     'Invalid end time format, expected "HH:MM" in 24 hours format',
+    //     {
+    //       id: toastId,
+    //     }
+    //   );
+    //   return;
+    // }
 
     const offeredCourseData = {
       ...data,
       maxCapacity: Number(data.maxCapacity),
       section: Number(data.section),
+      startTime: moment(new Date(data.startTime)).format("HH:mm"),
+      endTime: moment(new Date(data.endTime)).format("HH:mm"),
     };
 
     try {

@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import {
   Spin,
   Alert,
@@ -22,13 +21,14 @@ const formatDate = (datetime: DateTime) => {
   const date = new Date(datetime);
   return date.toISOString().split("T")[0];
 };
-const StudentOfferedCourse = () => {
-  const { studentId } = useParams();
+const StudentDashboard = () => {
   const {
     data: studentDetails,
     error,
     isLoading,
-  } = studentApi.useGetSingleDataQuery(studentId);
+  } = studentApi.useGetSingleDataQuery(undefined);
+  console.log(studentDetails);
+
   const student = studentDetails?.data;
 
   const capitalizeFirstLetter = (string: string): string => {
@@ -329,4 +329,4 @@ const StudentOfferedCourse = () => {
   );
 };
 
-export default StudentOfferedCourse;
+export default StudentDashboard;

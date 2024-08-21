@@ -15,10 +15,10 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const defaultValues = {
-    id: "2025010002",
-    password: "student@123",
-  };
+  // const defaultValues = {
+  //   id: "A-0001",
+  //   password: "admin@123",
+  // };
 
   const [login] = authApi.useLoginMutation();
 
@@ -72,7 +72,7 @@ const Login = () => {
             Welcome to FutureAcademy University
           </h1>
         </div>
-        <PhForm onSubmit={onSubmit} defaultValues={defaultValues}>
+        <PhForm onSubmit={onSubmit}>
           <PhInput type="text" name="id" label="User ID" />
           <PhInput type="password" name="password" label="Password" />
           <div style={{ textAlign: "center", marginBottom: "10px" }}>
