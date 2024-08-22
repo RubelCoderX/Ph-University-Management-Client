@@ -1,6 +1,9 @@
 import React from "react";
 import { Table, Button, TableColumnsType, Space } from "antd";
 import { studentApi } from "../../redux/features/Student/StudentApi";
+import { Card, Typography } from "antd";
+
+const { Text } = Typography;
 
 type Section = {
   section: string;
@@ -141,27 +144,39 @@ const StudentOfferedCourse: React.FC = () => {
 
   if (!modifiedData.length) {
     return (
-      <p
+      <Card
         style={{
           marginTop: "30px",
           textAlign: "center",
           fontSize: "20px",
           fontWeight: "bold",
+          borderColor: "red", // Optional: add a border color for emphasis
         }}
       >
-        No available Courses
-      </p>
+        <Text style={{ color: "red", fontSize: "24px" }}>
+          No available Courses in Here!!
+        </Text>
+        <div style={{ marginTop: "10px" }}>
+          <Text>
+            Please check back later or explore our available courses to get
+            started!
+          </Text>
+        </div>
+      </Card>
     );
   }
   return (
-    <Table
-      columns={columns}
-      dataSource={modifiedData}
-      rowKey="courseTitle"
-      pagination={false}
-      bordered
-      style={{ marginTop: "30px" }}
-    />
+    <div style={{ marginTop: "40px" }}>
+      <h2>My Offered Courses</h2>
+      <Table
+        columns={columns}
+        dataSource={modifiedData}
+        rowKey="courseTitle"
+        pagination={false}
+        bordered
+        style={{ marginTop: "30px" }}
+      />
+    </div>
   );
 };
 

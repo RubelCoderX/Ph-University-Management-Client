@@ -58,5 +58,27 @@ export const studentApi = baseApi.injectEndpoints({
       },
       providesTags: ["enrolledCourse"],
     }),
+    getEnrolledCoursesResult: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            params.append(item.name, item.value as string);
+          });
+        }
+        return {
+          url: "/enroll-courses/get-enrolled-courses-result",
+          method: "GET",
+          params: params,
+        };
+      },
+      transformResponse: (response: TResponseRedux<any>) => {
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
+      providesTags: ["enrolledCourse"],
+    }),
   }),
 });

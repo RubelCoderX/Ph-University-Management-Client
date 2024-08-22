@@ -22,7 +22,7 @@ const MyCourseStudent = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
   const [page, setPage] = useState(1);
   const { data: facultyCoursesData, isFetching } =
-    facultyApi.useGetMyFacultyOfferedCourseQuery([
+    facultyApi.useGetAllFacultyCourseQuery([
       {
         name: "semesterRegistration",
         value: registerSemesterId,
@@ -41,7 +41,7 @@ const MyCourseStudent = () => {
       },
       ...params,
     ]);
-  console.log(facultyCoursesData);
+
   const metaData = facultyCoursesData?.meta;
   const tableData = facultyCoursesData?.data?.map(
     ({

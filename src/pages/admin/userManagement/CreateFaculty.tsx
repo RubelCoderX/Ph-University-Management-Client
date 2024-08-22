@@ -36,7 +36,7 @@ const CreateFaculty = () => {
   const [loading, setLoading] = useState(false);
 
   const { data: departmentData } =
-    academicManagementApi.useGetAllAcademicDepartmentQuery(undefined);
+    academicManagementApi.useGetAllDepartmentQuery(undefined);
 
   const departmentOptions = departmentData?.data?.map((item) => ({
     value: item._id,

@@ -15,14 +15,14 @@ import { studentValidationSchema } from "../../../schemas/createStudent.schema";
 const { Title } = Typography;
 
 const CreateStudent = () => {
-  const [addStudent, { isLoading }] = userManagementApi.useAddStudentMutation();
+  const [addStudent] = userManagementApi.useAddStudentMutation();
   const [loading, setLoading] = useState(false);
 
   const { data: semesterData, isLoading: sIsLoading } =
     academicManagementApi.useGetAllSemestersQuery(undefined);
 
   const { data: departmentData, isLoading: dIsLoading } =
-    academicManagementApi.useGetAllAcademicDepartmentQuery(undefined, {
+    academicManagementApi.useGetAllDepartmentQuery(undefined, {
       skip: sIsLoading,
     });
   // for Academic Semester

@@ -1,3 +1,4 @@
+import CourseResult from "../pages/student/CourseResult";
 import MySchedule from "../pages/student/MySchedule";
 import StudentDashboard from "../pages/student/StudentDashboard";
 import StudentOfferedCourse from "../pages/student/StudentOfferedCourse";
@@ -17,5 +18,9 @@ export const studentPaths = [
     name: "My Course Schedule",
     path: "schedule",
     element: <MySchedule />,
+  },
+  {
+    path: "result/:courseId",
+    element: <CourseResult />,
   },
 ];

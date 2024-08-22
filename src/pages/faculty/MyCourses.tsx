@@ -1,15 +1,17 @@
-import { Button, Col, Flex } from "antd";
+import { Button, Col, Row, Typography } from "antd";
 import PhForm from "../../components/form/PhForm";
 import PhSelect from "../../components/form/PhSelect";
 import { facultyApi } from "../../redux/features/faculty/facultyApi";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
+const { Title } = Typography;
+
 const MyCourses = () => {
   const navigate = useNavigate();
   const { data: facultyCoursesData } =
-    facultyApi.useGetMyOfferedCourseQuery(undefined);
-  //   console.log(facultyCoursesData);
+    facultyApi.useGetAllFacultyCourseQuery(undefined);
+
   const semesterOptions = facultyCoursesData?.data?.map((item) => ({
     label: `${item.academicSemester.name}${item.academicSemester.year}`,
     value: item.semesterRegistration._id,
@@ -21,9 +23,13 @@ const MyCourses = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     navigate(`/faculty/courses/${data.semesterRegistration}/${data.course}`);
   };
+
   return (
-    <Flex style={{ marginTop: "30px" }} justify="center" align="center">
-      <Col span={6}>
+    <Row style={{ marginTop: "30px" }} justify="center">
+      <Col xs={22} sm={16} md={12} lg={8}>
+        <Title level={3} style={{ textAlign: "center", marginBottom: "20px" }}>
+          My All Courses
+        </Title>
         <PhForm onSubmit={onSubmit}>
           <PhSelect
             options={semesterOptions}
@@ -31,11 +37,12 @@ const MyCourses = () => {
             label="Semester"
           />
           <PhSelect options={courseOptions} name="course" label="Course" />
-
-          <Button htmlType="submit">Submit</Button>
+          <Button type="primary" htmlType="submit" block>
+            Submit
+          </Button>
         </PhForm>
       </Col>
-    </Flex>
+    </Row>
   );
 };
 

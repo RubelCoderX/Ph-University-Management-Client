@@ -3,7 +3,7 @@ import { baseApi } from "../../api/baseApi";
 
 export const facultyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getMyFacultyOfferedCourse: builder.query({
+    getAllFacultyCourse: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
         if (args) {
