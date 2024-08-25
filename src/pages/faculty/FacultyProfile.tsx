@@ -1,5 +1,3 @@
-import { useParams } from "react-router-dom";
-import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
 import {
   Spin,
   Alert,
@@ -11,9 +9,9 @@ import {
   Tabs,
   Divider,
 } from "antd";
-import { DateTime, fullName } from "../../../types";
-import { studentApi } from "../../../redux/features/Student/StudentApi";
 
+import { DateTime, fullName } from "../../types";
+import { studentApi } from "../../redux/features/Student/StudentApi";
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
@@ -23,17 +21,16 @@ const formatDate = (datetime: DateTime) => {
   const date = new Date(datetime);
   return date.toISOString().split("T")[0];
 };
-const AdminDetails = () => {
-  const { adminId } = useParams();
+const FacultyProfile = () => {
   const {
-    data: adminDetails,
+    data: facultyDetails,
     error,
     isLoading,
-  } = studentApi.useGetSingleDataQuery(adminId);
-  console.log(adminDetails);
-  const admin = adminDetails?.data;
+  } = studentApi.useGetSingleDataQuery(undefined);
 
-  const capitalizeFirstLetter = (string: string) => {
+  const faculty = facultyDetails?.data;
+
+  const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
@@ -68,15 +65,14 @@ const AdminDetails = () => {
       title={
         <span>
           Profile{" "}
-          <span style={{ color: "#1777FF" }}>{getFullName(admin?.name)}</span>
+          <span style={{ color: "#1777FF" }}>{getFullName(faculty?.name)}</span>
         </span>
       }
-      extra={<a href="/dashboard">Back to Dashboard</a>}
       style={{
         width: "100%",
-        maxWidth: 1200,
+        // maxWidth: 1200,
         margin: "auto",
-        marginTop: "30px",
+        marginTop: "50px",
       }}
     >
       <Row gutter={24}>
@@ -90,13 +86,13 @@ const AdminDetails = () => {
             }}
           >
             <Avatar
-              size={128}
-              src={admin?.profileImg}
+              size={180}
+              src={faculty?.profileImg}
               style={{
                 marginBottom: 20,
               }}
             />
-            <Title level={2}>{getFullName(admin?.name)}</Title>
+            <Title level={2}>{getFullName(faculty?.name)}</Title>
 
             <Text
               style={{
@@ -107,7 +103,7 @@ const AdminDetails = () => {
                 borderRadius: "4px",
               }}
             >
-              {capitalizeFirstLetter(admin?.user.status)}
+              {capitalizeFirstLetter(faculty?.user.status)}
             </Text>
             <hr
               style={{
@@ -120,21 +116,18 @@ const AdminDetails = () => {
             <br />
             <Text
               style={{ fontWeight: "bold" }}
-            >{`Admin ID : ${admin?.id}`}</Text>
+            >{`Faculty ID : ${faculty?.id}`}</Text>
             <br />
-
-            <hr
-              style={{ width: "100%", borderColor: "#EEEDEB", opacity: 0.5 }}
-            />
-            <Text>{adminDetails.batch}</Text>
-            <br />
-
-            <Text>{`Mobile : ${admin?.contactNo}`}</Text>
             <hr
               style={{ width: "100%", borderColor: "#EEEDEB", opacity: 0.5 }}
             />
             <br />
-            <Text>{`Email : ${admin?.email}`}</Text>
+            <Text>{`Mobile : ${faculty?.contactNo}`}</Text>
+            <hr
+              style={{ width: "100%", borderColor: "#EEEDEB", opacity: 0.5 }}
+            />
+            <br />
+            <Text>{`Email : ${faculty?.email}`}</Text>
           </Card>
         </Col>
         <Col xs={24} md={16}>
@@ -145,65 +138,94 @@ const AdminDetails = () => {
                 <Divider></Divider>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Text strong>Title: </Text>
+                    <Text strong>Title : </Text>
                     <Text style={{}}>
-                      {capitalizeFirstLetter(admin?.user?.role)}
+                      {capitalizeFirstLetter(faculty?.user?.role)}
                     </Text>
                   </Col>
                   <Col span={12}>
-                    <Text strong>Blood Group: </Text>
-                    <Text>{admin?.bloodGroup}</Text>
+                    <Text strong>Designatio : </Text>
+                    <Text>{capitalizeFirstLetter(faculty?.designation)}</Text>
                   </Col>
                 </Row>
                 <Divider></Divider>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Text strong>Gender: </Text>
-                    <Text>{capitalizeFirstLetter(admin?.gender)}</Text>
+                    <Text strong>Gender : </Text>
+                    <Text>{capitalizeFirstLetter(faculty?.gender)}</Text>
                   </Col>
                   <Col span={12}>
-                    <Text strong>Mother Tongue: </Text>
-                    <Text>{adminDetails.motherTongue || "-"} </Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Date of Birth: </Text>
-                    <Text>{formatDate(admin?.dateOfBirth)}</Text>
+                    <Text strong>Mother Tongue : </Text>
+                    <Text>{facultyDetails.motherTongue || "-"} </Text>
                   </Col>
                 </Row>
                 <Divider></Divider>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Text strong>Present Address: </Text>
-                    <Text>{admin?.presentAddress || "-"}</Text>
+                    <Text strong>Blood Group : </Text>
+                    <Text>{faculty?.bloodGroup}</Text>
                   </Col>
                   <Col span={12}>
-                    <Text strong>Permanent Address: </Text>
-                    <Text>{admin?.permanentAddress || "-"}</Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Emergency Contact No: </Text>
-                    <Text>{admin?.emergencyContactNo}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Religion: </Text>
-                    <Text>{adminDetails.religion}</Text>
+                    <Text strong>Date of Birth : </Text>
+                    <Text>{formatDate(faculty?.dateOfBirth)}</Text>
                   </Col>
                 </Row>
                 <Divider></Divider>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Text strong>Category: </Text>
-                    <Text>{adminDetails.category}</Text>
+                    <Text strong>Present Address : </Text>
+                    <Text>{faculty?.presentAddress || "-"}</Text>
                   </Col>
                   <Col span={12}>
-                    <Text strong>Nationality: </Text>
-                    <Text>{adminDetails.nationality}</Text>
+                    <Text strong>Permanent Address : </Text>
+                    <Text>{faculty?.permanentAddress || "-"}</Text>
+                  </Col>
+                </Row>
+                <Divider></Divider>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Text strong>Emergency Contact No : </Text>
+                    <Text>{faculty?.emergencyContactNo}</Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text strong>Religion : </Text>
+                    <Text>{facultyDetails.religion || "-"}</Text>
+                  </Col>
+                </Row>
+                <Divider></Divider>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Text strong>Category : </Text>
+                    <Text>{facultyDetails.category || "-"}</Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text strong>Nationality : </Text>
+                    <Text>{facultyDetails.nationality || "-"}</Text>
+                  </Col>
+                </Row>
+              </Card>
+            </TabPane>
+
+            <TabPane tab="Department" key="2">
+              <Card>
+                <Title level={4}>Department Information</Title>
+                <Divider></Divider>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Text strong>Name : </Text>
+                    <Text>{faculty?.academicDepartment?.name}</Text>
+                  </Col>
+                </Row>
+              </Card>
+            </TabPane>
+            <TabPane tab="Faculty" key="3">
+              <Card>
+                <Title level={4}>Faculty Information</Title>
+                <Divider></Divider>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Text strong>Name : </Text>
+                    <Text>{faculty?.academicFaculty?.name}</Text>
                   </Col>
                 </Row>
               </Card>
@@ -215,4 +237,4 @@ const AdminDetails = () => {
   );
 };
 
-export default AdminDetails;
+export default FacultyProfile;

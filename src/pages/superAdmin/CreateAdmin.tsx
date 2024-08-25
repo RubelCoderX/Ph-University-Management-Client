@@ -1,13 +1,15 @@
 import { Button, Col, Divider, Form, Input, Row, Typography } from "antd";
-import PhForm from "../../../components/form/PhForm";
-import PhInput from "../../../components/form/PhInput";
-import PhSelect from "../../../components/form/PhSelect";
-import { bloodGroupOptions, genderOptions } from "../../../constants/global";
-import PhDatePicker from "../../../components/form/PhDatePicker";
+
 import { Controller, FieldValues, SubmitHandler } from "react-hook-form";
-import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
+
 import { toast } from "sonner";
 import { useState } from "react";
+import { userManagementApi } from "../../redux/features/Admin/userManagement.api";
+import PhForm from "../../components/form/PhForm";
+import PhInput from "../../components/form/PhInput";
+import PhDatePicker from "../../components/form/PhDatePicker";
+import PhSelect from "../../components/form/PhSelect";
+import { bloodGroupOptions, genderOptions } from "../../constants/global";
 const { Title } = Typography;
 
 const defaultValues = {

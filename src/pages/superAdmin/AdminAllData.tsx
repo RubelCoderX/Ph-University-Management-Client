@@ -6,19 +6,21 @@ import {
   TableColumnsType,
   TableProps,
 } from "antd";
-import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
+
 import { Link } from "react-router-dom";
-import { TAdminData, TQueryParam } from "../../../types";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
+import { TAdminData, TQueryParam } from "../../types";
+import { userManagementApi } from "../../redux/features/Admin/userManagement.api";
 
 export type TTableData = Pick<
   TAdminData,
   "id" | "email" | "contactNo" | "name" | "user"
 >;
 
-const AdminData = () => {
+const AdminAllData = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
   const [page, setPage] = useState(1);
   const [deleteAdmin] = userManagementApi.useDeleteAdminMutation();
@@ -124,11 +126,11 @@ const AdminData = () => {
       render: (item) => {
         return (
           <Space>
-            <Link to={`/admin/admin-data/${item.key}`}>
+            <Link to={`/superAdmin/admin-data/${item.key}`}>
               <Button>Details</Button>
             </Link>
 
-            <Link to={`/admin/admin-update/${item.key}`}>
+            <Link to={`/superAdmin/admin-update/${item.key}`}>
               <Button>Update</Button>
             </Link>
             <Button onClick={() => handleDelete(item.key)}>Delete</Button>
@@ -181,4 +183,4 @@ const AdminData = () => {
   );
 };
 
-export default AdminData;
+export default AdminAllData;

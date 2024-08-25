@@ -10,11 +10,13 @@ import {
   useCurrentToken,
 } from "../../redux/features/auth/authSlice";
 import { verifyToken } from "../../utils/verifyToken";
+import { superAdminPaths } from "../../routes/superadmin.routes";
 const { Sider } = Layout;
 const userRole = {
   ADMIN: "admin",
   Faculty: "faculty",
   STUDENT: "student",
+  SUPERADMIN: "superAdmin",
 };
 const SideBar = () => {
   const token = useAppSelector(useCurrentToken);
@@ -35,7 +37,13 @@ const SideBar = () => {
       break;
     case userRole.STUDENT:
       sidebarItems = sidebarItemsGenerator(studentPaths, userRole.STUDENT);
-
+      break;
+    case userRole.SUPERADMIN:
+      console.log("superadmin");
+      sidebarItems = sidebarItemsGenerator(
+        superAdminPaths,
+        userRole.SUPERADMIN
+      );
       break;
 
     default:

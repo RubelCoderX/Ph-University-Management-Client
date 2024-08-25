@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
+
 import {
   Spin,
   Alert,
@@ -11,8 +11,8 @@ import {
   Tabs,
   Divider,
 } from "antd";
-import { DateTime, fullName } from "../../../types";
-import { studentApi } from "../../../redux/features/Student/StudentApi";
+import { DateTime } from "../../types";
+import { userManagementApi } from "../../redux/features/Admin/userManagement.api";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -23,14 +23,13 @@ const formatDate = (datetime: DateTime) => {
   const date = new Date(datetime);
   return date.toISOString().split("T")[0];
 };
-const AdminDetails = () => {
+const AdminSingleDataDetails = () => {
   const { adminId } = useParams();
   const {
     data: adminDetails,
     error,
     isLoading,
-  } = studentApi.useGetSingleDataQuery(adminId);
-  console.log(adminDetails);
+  } = userManagementApi.useGetAdminByIdQuery(adminId);
   const admin = adminDetails?.data;
 
   const capitalizeFirstLetter = (string: string) => {
@@ -215,4 +214,4 @@ const AdminDetails = () => {
   );
 };
 
-export default AdminDetails;
+export default AdminSingleDataDetails;

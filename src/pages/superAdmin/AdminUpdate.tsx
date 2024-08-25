@@ -1,20 +1,23 @@
 import { Button, Col, Divider, Form, Input, Row, Typography } from "antd";
-import { userManagementApi } from "../../../redux/features/Admin/userManagement.api";
-import PhForm from "../../../components/form/PhForm";
-import PhInput from "../../../components/form/PhInput";
-import PhSelect from "../../../components/form/PhSelect";
-import PhDatePicker from "../../../components/form/PhDatePicker";
+
 import {
   Controller,
   FieldValues,
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import { academicManagementApi } from "../../../redux/features/Admin/academicManagement.api";
+
 import { toast } from "sonner";
-import { bloodGroupOptions, genderOptions } from "../../../constants/global";
+
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { userManagementApi } from "../../redux/features/Admin/userManagement.api";
+import { academicManagementApi } from "../../redux/features/Admin/academicManagement.api";
+import PhInput from "../../components/form/PhInput";
+import PhSelect from "../../components/form/PhSelect";
+import PhDatePicker from "../../components/form/PhDatePicker";
+import PhForm from "../../components/form/PhForm";
+import { bloodGroupOptions, genderOptions } from "../../constants/global";
 const { Title } = Typography;
 
 type InputConfig = {
@@ -30,12 +33,6 @@ const AdminUpdate = () => {
   const [updateAdmin] = userManagementApi.useUpdateAdminMutation();
   const { data: adminData, isLoading: studentLoading } =
     userManagementApi.useGetAdminByIdQuery(adminId);
-  const { data: semesterData, isLoading: sIsLoading } =
-    academicManagementApi.useGetAllSemestersQuery(undefined);
-  const { data: departmentData, isLoading: dIsLoading } =
-    academicManagementApi.useGetAllAcademicDepartmentQuery(undefined, {
-      skip: sIsLoading,
-    });
 
   const { handleSubmit, control, setValue } = useForm({
     defaultValues: {

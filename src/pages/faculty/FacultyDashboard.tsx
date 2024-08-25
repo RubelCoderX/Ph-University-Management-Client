@@ -1,239 +1,102 @@
-import {
-  Spin,
-  Alert,
-  Card,
-  Row,
-  Col,
-  Typography,
-  Avatar,
-  Tabs,
-  Divider,
-} from "antd";
+import { Card, Col, Row, Table } from "antd";
+import { facultyApi } from "../../redux/features/faculty/facultyApi";
+import { BookOutlined } from "@ant-design/icons";
 
-import { DateTime, fullName } from "../../types";
-import { studentApi } from "../../redux/features/Student/StudentApi";
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
-
-// Function to extract and format the date
-const formatDate = (datetime: DateTime) => {
-  if (!datetime) return datetime;
-  const date = new Date(datetime);
-  return date.toISOString().split("T")[0];
-};
 const FacultyDashboard = () => {
-  const {
-    data: facultyDetails,
-    error,
-    isLoading,
-  } = studentApi.useGetSingleDataQuery(undefined);
+  const { data: facultyCourses } =
+    facultyApi.useGetAllFacultyCourseQuery(undefined);
 
-  const faculty = facultyDetails?.data;
+  const tableData = facultyCourses?.data?.map((item) => {
+    return {
+      key: item._id,
+      courseTitle: item.course.title,
+      courseCode: item.course.code,
+      semester: item.academicSemester.name,
+      year: item.academicSemester.year,
+      department: item.academicDepartment.name,
+      facultyName: `${item.faculty.name.firstName} ${
+        item.faculty.name.middleName ? item.faculty.name.middleName + " " : ""
+      }${item.faculty.name.lastName}`,
+      academicFaculty: item.academicFaculty?.name,
+    };
+  });
 
-  const capitalizeFirstLetter = (string: string): string => {
-    if (!string) return string;
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
-  // Function to construct full name
-  const getFullName = (name: fullName) => {
-    if (!name) return "";
-    const { firstName, middleName, lastName } = name;
-    return `${firstName} ${middleName ? middleName + " " : ""}${lastName}`;
-  };
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "calc(100vh - 64px)",
-          marginTop: "30px",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <Alert message="Error loading faculty details" type="error" />;
-  }
-
+  // Define the columns for the table
+  const columns = [
+    {
+      title: "Course Title",
+      dataIndex: "courseTitle",
+      key: "courseTitle",
+    },
+    {
+      title: "Course Code",
+      dataIndex: "courseCode",
+      key: "courseCode",
+    },
+    {
+      title: "Semester",
+      dataIndex: "semester",
+      key: "semester",
+    },
+    {
+      title: "Year",
+      dataIndex: "year",
+      key: "year",
+    },
+    {
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
+    },
+    {
+      title: "Academic Faculty",
+      dataIndex: "academicFaculty",
+      key: "academicFaculty",
+    },
+    {
+      title: "Faculty Name",
+      dataIndex: "facultyName",
+      key: "facultyName",
+    },
+  ];
+  const AllAdmins = facultyCourses?.meta?.total || 0;
   return (
-    <Card
-      title={
-        <span>
-          Profile{" "}
-          <span style={{ color: "#1777FF" }}>{getFullName(faculty?.name)}</span>
-        </span>
-      }
-      style={{
-        width: "100%",
-        // maxWidth: 1200,
-        margin: "auto",
-        marginTop: "50px",
-      }}
-    >
-      <Row gutter={24}>
-        <Col xs={24} md={8}>
-          <Card
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
-            }}
-          >
-            <Avatar
-              size={180}
-              src={faculty?.profileImg}
-              style={{
-                marginBottom: 20,
-              }}
-            />
-            <Title level={2}>{getFullName(faculty?.name)}</Title>
-
-            <Text
-              style={{
-                // textTransform: "uppercase",
-                backgroundColor: "#1777FF",
-                color: "#fff",
-                padding: "4px 8px",
-                borderRadius: "4px",
-              }}
+    <>
+      <div style={{ marginTop: "30px" }}>
+        <h2 style={{ marginBottom: "30px" }}> Faculty Dashboard</h2>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={8}>
+            <Card
+              title="Total Courses"
+              bordered={false}
+              style={{ borderRadius: 8, justifyItems: "center" }}
+              bodyStyle={{ padding: "20px" }}
             >
-              {capitalizeFirstLetter(faculty?.user.status)}
-            </Text>
-            <hr
-              style={{
-                width: "100%",
-                borderColor: "#EEEDEB",
-                opacity: 0.5,
-                marginTop: "10px",
-              }}
-            />
-            <br />
-            <Text
-              style={{ fontWeight: "bold" }}
-            >{`Faculty ID : ${faculty?.id}`}</Text>
-            <br />
-            <hr
-              style={{ width: "100%", borderColor: "#EEEDEB", opacity: 0.5 }}
-            />
-            <br />
-            <Text>{`Mobile : ${faculty?.contactNo}`}</Text>
-            <hr
-              style={{ width: "100%", borderColor: "#EEEDEB", opacity: 0.5 }}
-            />
-            <br />
-            <Text>{`Email : ${faculty?.email}`}</Text>
-          </Card>
-        </Col>
-        <Col xs={24} md={16}>
-          <Tabs defaultActiveKey="1">
-            <TabPane tab="Personal" key="1">
-              <Card>
-                <Title level={4}>Personal Information</Title>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Title : </Text>
-                    <Text style={{}}>
-                      {capitalizeFirstLetter(faculty?.user?.role)}
-                    </Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Designatio : </Text>
-                    <Text>{capitalizeFirstLetter(faculty?.designation)}</Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Gender : </Text>
-                    <Text>{capitalizeFirstLetter(faculty?.gender)}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Mother Tongue : </Text>
-                    <Text>{facultyDetails.motherTongue || "-"} </Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Blood Group : </Text>
-                    <Text>{faculty?.bloodGroup}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Date of Birth : </Text>
-                    <Text>{formatDate(faculty?.dateOfBirth)}</Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Present Address : </Text>
-                    <Text>{faculty?.presentAddress || "-"}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Permanent Address : </Text>
-                    <Text>{faculty?.permanentAddress || "-"}</Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Emergency Contact No : </Text>
-                    <Text>{faculty?.emergencyContactNo}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Religion : </Text>
-                    <Text>{facultyDetails.religion || "-"}</Text>
-                  </Col>
-                </Row>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Category : </Text>
-                    <Text>{facultyDetails.category || "-"}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Nationality : </Text>
-                    <Text>{facultyDetails.nationality || "-"}</Text>
-                  </Col>
-                </Row>
-              </Card>
-            </TabPane>
-
-            <TabPane tab="Department" key="2">
-              <Card>
-                <Title level={4}>Department Information</Title>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Name : </Text>
-                    <Text>{faculty?.academicDepartment?.name}</Text>
-                  </Col>
-                </Row>
-              </Card>
-            </TabPane>
-            <TabPane tab="Faculty" key="3">
-              <Card>
-                <Title level={4}>Faculty Information</Title>
-                <Divider></Divider>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Text strong>Name : </Text>
-                    <Text>{faculty?.academicFaculty?.name}</Text>
-                  </Col>
-                </Row>
-              </Card>
-            </TabPane>
-          </Tabs>
-        </Col>
-      </Row>
-    </Card>
+              <Row align="middle">
+                <Col span={8}>
+                  <BookOutlined
+                    style={{ fontSize: "40px", color: "#1890ff" }}
+                  />
+                </Col>
+                <Col span={16}>
+                  <h3>{AllAdmins}</h3>
+                  <p>45% Increase in 28 Days</p>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+      <div style={{ marginTop: "30px" }}>
+        <h2 style={{ marginBottom: "30px" }}>Total Courses List</h2>
+        <Table
+          columns={columns}
+          dataSource={tableData || []}
+          rowKey={(record) => record.key}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
+    </>
   );
 };
 
